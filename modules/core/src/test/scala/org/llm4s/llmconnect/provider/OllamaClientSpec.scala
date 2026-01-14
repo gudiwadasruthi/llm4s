@@ -6,7 +6,7 @@ import org.llm4s.llmconnect.config.OllamaConfig
 
 class OllamaClientSpec extends AnyFunSuite {
 
-  test("ollama chat request does not guarantee assistant content is a string (reproduces bug)") {
+  test("ollama chat request sends assistant content as a plain string") {
 
     val conversation = Conversation(
       messages = Seq(
@@ -48,8 +48,9 @@ class OllamaClientSpec extends AnyFunSuite {
       messages.find(_("role").str == "assistant").get
 
     assert(
-      !assistantMessage("content").isInstanceOf[ujson.Str],
-      "Expected assistant message content to NOT be a string (current buggy behavior)"
+      assistantMessage("content").isInstanceOf[ujson.Str],
+      "Expected assistant message content to be a string for Ollama"
     )
+    assert(assistantMessage("content").str == "", "Assistant content should default to empty string when missing")
   }
 }
